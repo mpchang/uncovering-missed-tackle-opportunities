@@ -3,7 +3,6 @@ data/
 expected_yards/
 tacklenet/
 fieldnet/
-*.gif
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
