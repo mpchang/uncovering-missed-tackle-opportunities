@@ -1,0 +1,83 @@
+# Description: Constants used throughout the project
+# Create a dict called CLUB_DICT where the keys are the abbreviations of the clubs and the values are integers from 0 to 32
+
+
+CLUB_DICT = {
+    "BUF": 0,
+    "LA": 1,
+    "NO": 2,
+    "ATL": 3,
+    "CLE": 4,
+    "CAR": 5,
+    "SF": 6,
+    "CHI": 7,
+    "CIN": 8,
+    "PIT": 9,
+    "PHI": 10,
+    "DET": 11,
+    "IND": 12,
+    "HOU": 13,
+    "MIA": 14,
+    "NE": 15,
+    "NYJ": 16,
+    "BAL": 17,
+    "TEN": 18,
+    "NYG": 19,
+    "JAX": 20,
+    "WAS": 21,
+    "KC": 22,
+    "ARI": 23,
+    "LV": 24,
+    "LAC": 25,
+    "MIN": 26,
+    "GB": 27,
+    "TB": 28,
+    "DAL": 29,
+    "DEN": 30,
+    "SEA": 31,
+    "football": 32,
+}
+
+FEATURE_DICT = {
+    "def_off_speed_dx": 0,
+    "def_off_speed_dy": 1,
+    # "relative_acceleration": 1,
+    # "cos(relative_orientation)": 2,
+    # "sin(relative_orientation)": 3,
+    # "cos(relative_direction)": 4,
+    # "sin(relative_direction)": 5,
+    "def_off_dx": 2,
+    "def_off_dy": 3,
+    # "relative_distance": 4,
+    # "cos(polar angle)": 5,
+    "mass_defense": 4,
+    "mass_offense": 5,
+    "def_ballcarrier_dx": 6,
+    "def_ballcarrier_dy": 7,
+    "def_ballcarrier_speed_dx": 8,
+    "def_ballcarrier_speed_dy": 9,
+}
+
+FIELDNET_FEATURE_DICT = {
+    "def_mass": 0,
+    "def_speed_x": 1,
+    "def_speed_y": 2,
+    "off_mass": 3,
+    "off_speed_x": 4,
+    "off_speed_y": 5,
+    "ballcarrier_mass": 6,
+}
+
+TACKLENET_FEATURE_DICT = {
+    "bc_speed": 0,
+    "relative_speed_x": 1,
+    "relative_speed_y": 2,
+    "euclidian_distance": 3,
+    "angle_of_attack": 4,
+    # "orientation_of_attack": 5,
+    # "relative_mass": 5,
+    "voronoi_cell_area": 5,
+    "team_influence": 6,
+    "blocker_influence": 7,
+    "is_run": 8,
+}
