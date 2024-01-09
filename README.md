@@ -1,4 +1,4 @@
-Code for the [NFL Big Data Bowl 2024](https://www.kaggle.com/competitions/nfl-big-data-bowl-2024/data) submission "Uncovering Tackle Opportunities and Missed Opportunities".
+Code for the [NFL Big Data Bowl 2024](https://www.kaggle.com/competitions/nfl-big-data-bowl-2024/data) submission "[Uncovering Tackle Opportunities and Missed Opportunities](https://www.kaggle.com/code/matthewpchang/uncovering-missed-tackle-opportunities)".
 
 Created and maintained by [@mpchang](https://github.com/mpchang), [@katdai](https://github.com/katdai), [@bolongcheng](https://bolongcheng.com/), [@danielrjiang](https://danielrjiang.github.io/)
 
