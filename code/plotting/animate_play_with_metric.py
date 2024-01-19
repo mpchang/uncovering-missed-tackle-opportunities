@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib import patches
 import matplotlib as mpl
@@ -178,7 +179,7 @@ def update_play_animation(
         lab = labels[id]
         if (
             highlightIds is None
-        ):  # if a highlightIds list was provided, only label these players. If not, label everyone
+        ):  # if a highlightIds list was not provided, label everyone
             plot_metric_player(
                 x=x_def[id][frame],
                 y=y_def[id][frame],
@@ -187,8 +188,17 @@ def update_play_animation(
                 ax=ax,
                 marker_size=150,
             )
-        else:
-            if id not in highlightIds:
+        else:  # if a highlightIds list was provided, label only those players
+            if id in highlightIds:
+                plot_metric_player(
+                    x=x_def[id][frame],
+                    y=y_def[id][frame],
+                    metric=metric[id][frame],
+                    labels=lab,
+                    ax=ax,
+                    marker_size=150,
+                )
+            else:
                 plot_metric_player(
                     x=x_def[id][frame],
                     y=y_def[id][frame],
@@ -539,9 +549,19 @@ if __name__ == "__main__":
     output_dir = os.path.join(root_dir, "plotting/generated_plots/")
 
     # These are the players to follow. If none, then it will follow the whole defense
-    # defenseIds = [52482, 44851, 48027, 52665, 54514, 43409, 48537, 53505, 37097]   # play 2022110700, 2902
+    defenseIds = [
+        52482,
+        44851,
+        48027,
+        52665,
+        54514,
+        43409,
+        48537,
+        53505,
+        37097,
+    ]  # play 2022110700, 2902
     # defenseIds = [53532, 43294, 41239]  # 2022110609, 271
-    defenseIds = None
+    # defenseIds = None
     offenseIds = None
     # highlightIds = None
     # highlightIds = [53532, 43294, 41239]
