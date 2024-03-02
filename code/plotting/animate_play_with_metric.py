@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib import patches
 import matplotlib as mpl
@@ -101,7 +100,9 @@ def create_football_field(ax, linenumbers=True, xlim=None, ylim=None):
 
 # Function that plots a player's trail in the frame
 # The color of the data point will correspond to the metric provided
-def plot_metric_player(x, y, metric, ax, labels=None, marker_size=100):
+def plot_metric_player(
+    x, y, metric, ax, labels=None, marker_size=100, presentation_mode=False
+):
     if isinstance(x, list):
         assert (
             len(x) == len(y) == len(metric)
@@ -114,9 +115,20 @@ def plot_metric_player(x, y, metric, ax, labels=None, marker_size=100):
         ), "x, y, and metric must be floats if one of them is a float"
 
     # Plot players
+    if y:  # temp hack to reflect y
+        if isinstance(y, list):
+            y = [53 - v for v in y]
+        else:
+            y = 53 - y
+    else:
+        pass
+
     c = ax.scatter(x, y, c=metric, cmap="coolwarm", s=marker_size, vmin=0, vmax=1)
+    fontsize = 12 if not presentation_mode else 20
     if labels is not None:
-        ax.text(x, y + 1, labels, fontsize=12, color="black", ha="center", va="center")
+        ax.text(
+            x, y + 1, labels, fontsize=fontsize, color="black", ha="center", va="center"
+        )
     return c
 
 
@@ -125,6 +137,13 @@ def plot_nonmetric_player(
     x, y, ax, edgecolors="black", facecolors="black", marker_size=100
 ):
     # Plot players
+    if y:  # temp hack to reflect y
+        if isinstance(y, list):
+            y = [53 - v for v in y]
+        else:
+            y = 53 - y
+    else:
+        pass
     c = ax.scatter(
         x,
         y,
@@ -159,6 +178,7 @@ def update_play_animation(
     highlightIds=None,
     missed_tackle_dict=None,
     made_tackle_dict=None,
+    presentation_mode=False,
 ):
     """Function to animate the player movement and metric"""
 
@@ -166,13 +186,26 @@ def update_play_animation(
     for artist in ax.collections + ax.texts + ax.patches:
         artist.remove()
 
+    if presentation_mode:
+        marker_size = 300
+        fontsize = 32
+        linewidth = 5
+    else:
+        marker_size = 150
+        fontsize = 24
+        linewidth = 2
+
     if frame >= max_frames:  # add 5 frames to pause at the end
         frame = max_frames - 1
 
     for id in defenseIds:  # plot defensive players with metric
         # create trail of past positions
         plot_metric_player(
-            x_def[id][:frame], y_def[id][:frame], metric[id][:frame], ax, marker_size=50
+            x_def[id][:frame],
+            y_def[id][:frame],
+            metric[id][:frame],
+            ax,
+            marker_size=50,
         )
 
         # create current position
@@ -186,7 +219,7 @@ def update_play_animation(
                 metric=metric[id][frame],
                 labels=lab,
                 ax=ax,
-                marker_size=150,
+                marker_size=marker_size,
             )
         else:  # if a highlightIds list was provided, label only those players
             if id in highlightIds:
@@ -196,7 +229,8 @@ def update_play_animation(
                     metric=metric[id][frame],
                     labels=lab,
                     ax=ax,
-                    marker_size=150,
+                    marker_size=marker_size,
+                    presentation_mode=presentation_mode,
                 )
             else:
                 plot_metric_player(
@@ -205,7 +239,7 @@ def update_play_animation(
                     metric=metric[id][frame],
                     labels=None,
                     ax=ax,
-                    marker_size=150,
+                    marker_size=marker_size,
                 )
 
     for id in offenseIds:  # plot offensive players without metric
@@ -213,7 +247,7 @@ def update_play_animation(
             x_off[id][frame],
             y_off[id][frame],
             ax,
-            marker_size=100,
+            marker_size=marker_size - 50,
             edgecolors="black",
             facecolors="white",
         )
@@ -223,54 +257,60 @@ def update_play_animation(
         x_off[ballCarrierId][frame],
         y_off[ballCarrierId][frame],
         ax,
-        marker_size=150,
+        marker_size=marker_size,
         edgecolors="black",
         facecolors="black",
     )
 
     # add time elapsed counter
-    ax.text(
-        ax.get_xlim()[0],
-        -2,
-        f"Time Elapsed {frame * 0.1:.1f} seconds",
-        fontsize=20,
-        color="black",
-        ha="left",
-    )
+    if not presentation_mode:
+        ax.text(
+            ax.get_xlim()[0],
+            -2,
+            f"Time Elapsed {frame * 0.1:.1f} seconds",
+            fontsize=fontsize,
+            color="black",
+            ha="left",
+        )
 
     # add play description
-    if 10 <= len(play_desc.split(" ")) < 20:
-        play_desc = (
-            " ".join(play_desc.split(" ")[:10])
-            + "\n"
-            + " ".join(play_desc.split(" ")[10:])
-        )
-    elif len(play_desc.split(" ")) >= 20:
-        play_desc = (
-            " ".join(play_desc.split(" ")[:10])
-            + "\n"
-            + " ".join(play_desc.split(" ")[10:20])
-            + "\n"
-            + " ".join(play_desc.split(" ")[20:])
-        )
+    if not presentation_mode:
+        if 10 <= len(play_desc.split(" ")) < 20:
+            play_desc = (
+                " ".join(play_desc.split(" ")[:10])
+                + "\n"
+                + " ".join(play_desc.split(" ")[10:])
+            )
+        elif len(play_desc.split(" ")) >= 20:
+            play_desc = (
+                " ".join(play_desc.split(" ")[:10])
+                + "\n"
+                + " ".join(play_desc.split(" ")[10:20])
+                + "\n"
+                + " ".join(play_desc.split(" ")[20:])
+            )
 
-    ax.text(
-        ax.get_xlim()[0],
-        ax.get_ylim()[1] + 1,
-        f"GameId = {gameId}, PlayId = {playId} \n {play_desc}",
-        ha="left",
-        fontsize=20,
-    )
+        ax.text(
+            ax.get_xlim()[0],
+            ax.get_ylim()[1] + 1,
+            f"GameId = {gameId}, PlayId = {playId} \n {play_desc}",
+            ha="left",
+            fontsize=20,
+        )
 
     # if missed_tackle_dict provided, annotate it with a red box
     if missed_tackle_dict is not None:
         for id, m_frame in missed_tackle_dict.items():
             if m_frame <= frame:
                 rectangle = patches.Rectangle(
-                    (x_def[id][m_frame] - 1.5, y_def[id][m_frame] - 1.5),
+                    (
+                        x_def[id][m_frame]
+                        - 1.5,  # m_frame - 5 puts the box back when the probability was still high. Looks better
+                        53 - (y_def[id][m_frame] - 1.5) - 3,  # temp hack to reflect
+                    ),
                     3,
                     3,
-                    linewidth=2,
+                    linewidth=linewidth,
                     edgecolor="red",
                     facecolor="red",
                     fill=False,
@@ -285,10 +325,10 @@ def update_play_animation(
         for id, m_frame in made_tackle_dict.items():
             if m_frame <= frame:
                 rectangle = patches.Rectangle(
-                    (x_def[id][m_frame] - 1.5, y_def[id][m_frame] - 1.5),
+                    (x_def[id][m_frame] - 1.5, 53 - (y_def[id][m_frame] - 1.5) - 3),
                     3,
                     3,
-                    linewidth=2,
+                    linewidth=linewidth,
                     edgecolor="green",
                     facecolor="green",
                     fill=False,
@@ -300,13 +340,18 @@ def update_play_animation(
 def make_play_with_metric_animation(
     gameId,
     playId,
+    frames,
     defenseIds,
     offenseIds,
+    ballCarrierId,
+    probs_dict,
     df_sequence,
     names,
     highlightIds=[],
     missed_tackle_dict=None,
     made_tackle_dict=None,
+    plays_fname=None,
+    presentation_mode=False,
 ):
     # create dictionary of player positions throughout the play
     for id in defenseIds:
@@ -335,12 +380,14 @@ def make_play_with_metric_animation(
     y_max = 53.3
 
     # Extract Play Description
-    df_plays = pd.read_csv(os.path.join(root_dir, "data/plays.csv"))
+    if plays_fname is None:
+        plays_fname = os.path.join(root_dir, "data/plays.csv")
+
+    df_plays = pd.read_csv(plays_fname)
     desc = df_plays[
         (df_plays.gameId == gameId) & (df_plays.playId == playId)
     ].playDescription.values[0]
 
-    # Create Figure and Animation
     fig, ax = plt.subplots(1, figsize=((x_max - x_min) * 10 / 53.3, 10))
     create_football_field(ax, xlim=[x_min, x_max], ylim=[y_min, y_max])
     cmap = mpl.cm.coolwarm
@@ -355,7 +402,8 @@ def make_play_with_metric_animation(
         fraction=0.046,
         orientation="vertical",
     )
-    cb.set_label(label="Tackle Probability", size=20)
+    cb_label = "Tackle Probability" if not presentation_mode else ""
+    cb.set_label(label=cb_label, size=20)
     cb.ax.tick_params(axis="y", labelsize=20)
     animation = FuncAnimation(
         fig,
@@ -378,6 +426,7 @@ def make_play_with_metric_animation(
             missed_tackle_dict=missed_tackle_dict,
             made_tackle_dict=made_tackle_dict,
             ax=ax,
+            presentation_mode=presentation_mode,
         ),
         frames=len(frames) + 5,  # add 5 frames to pause at the end
         interval=200,
@@ -397,18 +446,32 @@ def update_tackle_probability(
     ax,
     highlightIds=None,
     missed_tackle_dict=None,
+    presentation_mode=False,
 ):
     if frame >= max_frames:  # if frames exceeds max_frames, pause on the last frame
         frame = max_frames - 1
     if highlightIds is None:
-        highlightIds = []
+        highlightIds = ids
+
+    if presentation_mode:
+        linewidth = 10
+        marker_size = 100
+        fontsize = 32
+        legend_fontsize = 24
+    else:
+        linewidth = 3
+        marker_size = 50
+        fontsize = 24
+        legend_fontsize = 20
 
     t = np.linspace(0, frame * 0.1, frame + 1)
     ax.cla()
     for id in ids:
         if id in highlightIds:
-            ax.plot(t, probs_dict[id][: frame + 1], label=names[id], linewidth=3)
-            ax.scatter(t[-1], probs_dict[id][frame], s=50)
+            ax.plot(
+                t, probs_dict[id][: frame + 1], label=names[id], linewidth=linewidth
+            )
+            ax.scatter(t[-1], probs_dict[id][frame], s=marker_size)
         else:
             ax.plot(
                 t,
@@ -418,26 +481,35 @@ def update_tackle_probability(
                 alpha=0.4,
             )
             ax.scatter(t[-1], probs_dict[id][frame], s=50, color="gray", alpha=0.5)
-    ax.set_xlabel("Time (s)", fontsize=24)
-    ax.set_ylabel("Tackle Probability in the next 1 second", fontsize=24)
+    ylabel = (
+        "Tackle Probability in the next 1 second"
+        if not presentation_mode
+        else "Tackle Probability"
+    )
+    ax.set_xlabel("Time (s)", fontsize=fontsize)
+    ax.set_ylabel(ylabel, fontsize=fontsize)
     ax.set_ylim([0, 1])
     ax.set_xlim([0, max_frames * 0.1])
-    ax.hlines(0.75, 0, max_frames * 0.1, linestyles="dashed", colors="gray")
+    ax.hlines(0.75, 0, max_frames * 0.1, linestyles="dashed", colors="black")
+    threshold_label = (
+        "Tackle Opportunity Threshold" if not presentation_mode else "Threshold"
+    )
     ax.text(
         max_frames * 0.1,
         0.76,
-        "Tackle Opportunity Threshold",
-        fontsize=20,
-        color="gray",
+        threshold_label,
+        fontsize=fontsize,
+        color="black",
         ha="right",
     )
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
     ax.set_yticklabels([0, 0.25, 0.5, 0.75, 1.0])
-    ax.tick_params(axis="both", which="major", labelsize=24)
-    ax.tick_params(axis="both", which="minor", labelsize=24)
-    ax.legend(loc="upper left", fancybox=True, fontsize=20)
+    ax.tick_params(axis="both", which="major", labelsize=fontsize)
+    ax.tick_params(axis="both", which="minor", labelsize=fontsize)
+    ax.legend(loc="upper left", fancybox=True, fontsize=legend_fontsize)
 
-    ax.set_title("Tackle Probability over Time", y=1.1, fontsize=20)
+    title = "Tackle Probability over Time" if not presentation_mode else ""
+    ax.set_title(title, y=1.1, fontsize=fontsize)
     ax.set_frame_on(False)
 
     if missed_tackle_dict is not None:
@@ -448,10 +520,10 @@ def update_tackle_probability(
                 ax.text(
                     m_frame * 0.1,
                     probs_dict[id][m_frame] + 0.03,
-                    "Missed Tackle Opportunity",
+                    "Missed Tackle Opp.",
                     fontdict={
                         "family": "sans-serif",
-                        "size": 20,
+                        "size": fontsize,
                         "weight": "normal",
                         "ha": "center",
                         "va": "center",
@@ -465,12 +537,13 @@ def update_tackle_probability(
                     m_frame * 0.1,
                     probs_dict[id][m_frame],
                     color="red",
-                    marker="x",
-                    s=300,
+                    marker="*",
+                    s=400,
                     label="Missed Tackle Opp.",
+                    zorder=10,
                 )
                 if not added:
-                    ax.legend(loc="upper left", fancybox=True, fontsize=20)
+                    ax.legend(loc="upper left", fancybox=True, fontsize=legend_fontsize)
                     added = True
 
 
@@ -482,6 +555,7 @@ def make_tackle_probability_animation(
     display=False,
     highlightIds=[],
     missed_tackle_dict=None,
+    presentation_mode=False,
 ):
     fig, ax = plt.subplots(1, figsize=(15, 10))
     animation = FuncAnimation(
@@ -495,6 +569,7 @@ def make_tackle_probability_animation(
             highlightIds=highlightIds,
             missed_tackle_dict=missed_tackle_dict,
             ax=ax,
+            presentation_mode=presentation_mode,
         ),
         frames=len(frames) + 5,  # add 5 frames to pause at the end
         interval=200,
@@ -547,31 +622,16 @@ if __name__ == "__main__":
     )
 
     output_dir = os.path.join(root_dir, "plotting/generated_plots/")
+    PLAYS_FNAME = os.path.join(root_dir, "data/plays.csv")
 
     # These are the players to follow. If none, then it will follow the whole defense
-    defenseIds = [
-        52482,
-        44851,
-        48027,
-        52665,
-        54514,
-        43409,
-        48537,
-        53505,
-        37097,
-    ]  # play 2022110700, 2902
-    # defenseIds = [53532, 43294, 41239]  # 2022110609, 271
-    # defenseIds = None
+    defenseIds = [54514, 52482, 44851, 52665, 48027]
     offenseIds = None
-    # highlightIds = None
-    # highlightIds = [53532, 43294, 41239]
     highlightIds = [54514, 52482, 44851, 52665, 48027]
-    # dictionary of missed tackles to annotate
-    # missed_tackle_dict = None
     missed_tackle_dict = {54514: 32, 52482: 48, 52665: 49, 48027: 40}
-    # made_tackle_dict = {43294: 60}
     made_tackle_dict = {44851: 70}
-    # made_tackle_dict = None
+
+    presentation_mode = True
 
     # END USER VARIABLES - DO NOT CHANGE ANYTHING BELOW THIS LINE
     # ===========================================================
@@ -642,6 +702,7 @@ if __name__ == "__main__":
         names,
         highlightIds=highlightIds,
         missed_tackle_dict=missed_tackle_dict,
+        presentation_mode=presentation_mode,
     )
     writer1 = PillowWriter(fps=5, bitrate=1800)
     plot_animation.save(
@@ -654,13 +715,18 @@ if __name__ == "__main__":
     play_animation = make_play_with_metric_animation(
         gameId,
         playId,
+        frames,
         defenseIds,
         offenseIds,
+        ballCarrierId,
+        probs_dict,
         df_sequence,
         names,
         highlightIds=highlightIds,
         missed_tackle_dict=missed_tackle_dict,
         made_tackle_dict=made_tackle_dict,
+        plays_fname=PLAYS_FNAME,
+        presentation_mode=presentation_mode,
     )
     writer2 = PillowWriter(fps=5, bitrate=1800)
     play_animation.save(

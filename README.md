@@ -20,5 +20,6 @@ To train the model and build the metrics, follow these instructions:
 1. **Add raw data files to the code/data/ directory**. Tracking data, tackle data, play data, and player data are all required.
 2. **Execute load_data.ipynb.** This notebook will load and process the data into TackleSequence objects that can be consumed by the model.
 3. **Execute train_model.ipynb.** This notebook will split the data into train/test, train the model, and evaluate it on the test set.
-4. **Execute build_metrics.ipynb.** This notebook will use the trained model to extract tackle opportunities, missed tackle opportunities, and tackle conversions from all tracking data, and create visualizations.
-5. (Optional). **Execute spatial_analysis.ipynb.** This notebook is used to produce visualizations of the forward voronoi area, team influence, and blocker influence spatial features.
+4. **Execute run_inference.ipynb** This notebook can be used to run inference on an entire play, and generate nice visualizations including tackle probability charts and birds-eye view heatmaps for select defenders on each play.
+5. **Execute build_metrics.ipynb.** This notebook will use the trained model to extract tackle opportunities, missed tackle opportunities, and tackle conversions from all tracking data, and create visualizations. **Note, this code takes over 5 hours to run on an M1 Macbook Pro.**
+6. (Optional). **Execute spatial_analysis.ipynb.** This notebook is used to produce visualizations of the forward voronoi area, team influence, and blocker influence spatial features.
