@@ -170,11 +170,10 @@ def get_areas_from_points(point_dict, ballCarrierId=None, restriction=5) -> dict
 
     area_dict = _get_areas_from_points(points, bounds)
 
+    # map cell area from points to nflIds
     new_area_dict = {}
-    player_dict = {v: k for k, v in point_dict.items()}
-    for k, v in area_dict.items():
-        if k in player_dict.keys():
-            new_area_dict[player_dict[k]] = v
+    for k, v in point_dict.items():  # k = nflId, v = point
+        new_area_dict[k] = area_dict[v]
 
     return new_area_dict
 
@@ -469,12 +468,6 @@ def plot_influence_grid(influence_fn, grid, cmap_range=None):
     else:
         c = plt.contourf(xx, yy, z, cmap="coolwarm")
     plt.colorbar(c, label="Team Influence (+ = offense)")
-
-
-# TODO:
-# 1) compute_rotation_matrix(direction) -> returns a matrix with the rotation transformation
-# 2) compute_scaling_matrix(speed) -> returns a matrix with the scaling transformation
-# 3) modify the single_player_influence function to compute the new covariant matrix using the rotation and scaling matrices
 
 
 def compute_rotation_matrix(direction: float) -> np.array:
