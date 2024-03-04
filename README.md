@@ -13,9 +13,33 @@ We present a new set of metrics to analyze how well defenders perform in the tac
 - **Missed Tackle Opportunity**: When defender X's tackle probability on a play exceeds 75% for $>0.5$ second interval and subsequently falls below 75% for $>0.5$ second interval . This occurs when neither defender X nor any of their teammates makes a tackle during the tackle opportunity. This is a new class of defensive mistake not captured by current tackling metrics.
 - **Converted Tackle Opportunity**: When defender X is assigned a tackle in the tackle data.
 
-# Build Instructions
+## Set Up
 
-To train the model and build the metrics, follow these instructions:
+Create a virtual environment. It's easiest to use Miniconda to manage Python and dependencies.
+
+You can follow the instruction [here](https://docs.conda.io/projects/miniconda/en/latest/index.html#quick-command-line-install) to download and install Miniconda on your machine.
+
+This project uses Python 3.10. Create an environment with
+
+```bash
+conda create -n tackle-probability python=3.10
+```
+
+Activate the virtual environment with
+
+```bash
+conda activate tackle-probability
+```
+
+Install all python dependencies
+
+```
+pip install -r requirements.txt
+```
+
+## Running Instructions
+
+To train the model, run inference on plays, and extract metrics by player, follow these instructions:
 
 1. **Add raw data files to the code/data/ directory**. Tracking data, tackle data, play data, and player data are all required. Download the raw data from Kaggle: https://www.kaggle.com/competitions/nfl-big-data-bowl-2024/data
 2. **Execute load_data.ipynb.** This notebook will load and process the data into TackleSequence objects that can be consumed by the model.
